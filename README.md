@@ -13,4 +13,6 @@
 > venv (virtual environment) is only for your own convinience
 
 # What does it do?
-It creates PGM files of generated noises, that can be later translated into PNG format via external tool like ImageMagick
+It creates PGM files of generated noises, that can be later translated into PNG format via external tool like ImageMagick.
+For this tool, there is also `parse.sh/.cmd`, which makes it easier for parsing all images.
+
