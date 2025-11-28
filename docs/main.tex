@@ -8,6 +8,7 @@
 % Math + code + images
 \usepackage{amsmath}
 \usepackage{graphicx}
+\graphicspath{{images/}}
 \usepackage{float}
 \usepackage{listings}
 \usepackage{caption}
@@ -29,24 +30,28 @@
 % Titulní strana ve stylu předchozí práce
 % ============================================================
 \begin{titlepage}
+    \includegraphics[width=0.80\textwidth]{images/fav.pdf}
     \begin{center}
-        {\Large Západočeská univerzita v Plzni\\
-        Fakulta aplikovaných věd\\
-        Katedra informatiky a výpočetní techniky\par}
-        
+        \vspace{2cm}
+
+        \LARGE
+        Semestrální práce z KIV/PRO
+
+        \Huge
+        \textbf{Porovnání algoritmů Value Noise, Perlin Noise a Worley Noise}
+
+        \vspace{1cm}
+
         \vfill
-        
-        {\LARGE \textbf{Porovnání algoritmů Value Noise, Perlin Noise a Worley Noise}\par}
+
         \vspace{0.5cm}
-        {\large Semestrální práce z předmětu KIV/PRO\par}
-        
-        \vfill
-        
-        \begin{flushright}
-            \large
-            \textbf{Autor:} Vít Novotný\\[0.3em]
-            \textbf{Akademický rok:} 2024/2025
-        \end{flushright}
+
+        \normalsize
+        \raggedright
+        Autor: Vít Novotný \hfill Datum: \today
+
+        \vspace{0.2cm}
+
     \end{center}
 \end{titlepage}
 
@@ -57,52 +62,37 @@
 \section{Zadání}
 % ============================================================
 
-Cílem práce je studium a implementace algoritmů pro procedurální generování dvourozměrného šumu. 
+Cílem práce je implementace algoritmů pro procedurální generování dvourozměrného šumu a jejich následné porovnání. 
 Hlavní metodou je algoritmus \textbf{Perlin noise}, ke kterému jsou pro účely porovnání implementovány algoritmy 
 \textbf{Value noise} a \textbf{Worley (cellular) noise}. 
 
-Všechny algoritmy budou implementovány v jazyce Python pod společným rozhraním a porovnávány při stejných parametrech 
+Všechny algoritmy budou implementovány v jazyce Python a porovnávány při stejných parametrech 
 (seed, měřítko, rozlišení). Výstupem budou grayscale obrázky, analýza vlastností jednotlivých noise metod a jejich vzájemné porovnání.
 
+\newpage
 % ============================================================
 \section{Existující metody}
 % ============================================================
 
-V této kapitole jsou popsány tři algoritmy pro generování dvourozměrného šumu. 
-U každého je uveden princip, výhody, nevýhody a stručná historie.
-
 \subsection{Value Noise}
-Popis principu:
-\begin{itemize}
-    \item Každému bodu integer mřížky je přiřazena pseudonáhodná hodnota.
-    \item Hodnoty mezi body jsou interpolovány (lineárně nebo pomocí funkce fade).
-    \item Výsledkem je hladký, ale relativně jednoduchý šum.
-\end{itemize}
+Value noise je jednoduchý procedurální šum, ve kterém je každému rohu mřížky přiřazena pseudonáhodná skalární hodnota. Hodnota šumu uvnitř buňky se pak získává interpolací těchto čtyř hodnot, obvykle pomocí lineární nebo vyhlazené fade funkce. Výsledkem je hladký, vizuálně jednoduchý šum, který zachovává základní mřížkovou strukturu.
+
+Výhodou value noise je jeho rychlá a snadná implementace a nízká výpočetní náročnost. Nevýhodou je omezená vizuální komplexnost a to, že výsledný šum může působit uměle nebo příliš pravidelně. Value noise se používá spíše jako úvodní metoda nebo základ pro složitější algoritmy, které z něj vycházejí. \cite{wikipedia_value_noise}
 
 \subsection{Perlin Noise}
-Popis principu:
-\begin{itemize}
-    \item Gradientový šum navržený Kenem Perlinem (1985).
-    \item Každému rohu buňky je přiřazen gradientový vektor.
-    \item Výsledná hodnota je dána skalárním součinem a interpolací.
-    \item Výhody: hladkost, přirozený vzhled, široké použití v grafice.
-\end{itemize}
+Perlin noise, který navrhl Ken Perlin v roce 1985, je gradientový šum. Místo náhodných hodnot přiřazuje každému rohu buňky náhodný gradientový vektor. Hodnota šumu se vypočítá jako skalární součin tohoto vektoru a směru k vyhodnocovanému bodu. Výsledný šum je následně plynule interpolován pomocí speciální vyhlazovací funkce.
+
+Hlavní výhodou Perlinova šumu je jeho přirozený a spojitý vzhled, díky kterému se používá pro generování terénů, oblaků, ohně nebo organických textur. Nevýhodou je složitější implementace a možnost vzniku jemných mřížkových artefaktů. I přesto je Perlin noise dlouhodobě standardem v počítačové grafice a základní metodou mnoha dalších šumových algoritmů. \cite{wikipedia_perlin_noise}
 
 \subsection{Worley Noise}
-Popis principu:
-\begin{itemize}
-    \item Cellular noise (Steven Worley, 1996).
-    \item V každé buňce existuje náhodně umístěný „feature point“.
-    \item Hodnota šumu je vzdálenost k nejbližšímu z nich.
-    \item Vytváří buněčné a voronoi–podobné struktury.
-\end{itemize}
+Worley noise, představený Stevenem Worleym v roce 1996, je šum založený na vzdálenosti. Každá buňka mřížky obsahuje náhodně umístěný feature point a hodnota šumu je určena vzdáleností k nejbližšímu z těchto bodů. Výsledné vzory připomínají Voroného diagramy nebo buněčné struktury.
 
+Výhodou Worley noise je charakteristický, výrazně odlišný vzhled, vhodný pro textury jako kámen, pěna, popraskané povrchy nebo organické materiály. Nevýhodou je vyšší výpočetní náročnost a méně spojitý charakter výsledného šumu. Oproti Perlinovu šumu vytváří ostřejší a výraznější obrazce. \cite{wikipedia_worley_noise}
+
+\newpage
 % ============================================================
 \section{Zvolené řešení}
 % ============================================================
-
-V této kapitole je popsán postup implementace jednotlivých algoritmů 
-a sjednocené rozhraní, které umožňuje porovnání metod.
 
 \subsection{Sjednocené rozhraní}
 
@@ -117,13 +107,30 @@ sample(x : float, y : float) -> float in [0,1]
 
 \begin{algorithm}[H]
 \caption{ValueNoise.sample(x, y)}
-\begin{algorithmic}
-\State $(x_0, y_0) \gets \lfloor x \rfloor, \lfloor y \rfloor$
-\State $(x_1, y_1) \gets (x_0 + 1, y_0 + 1)$
-\State $v_{00}, v_{10}, v_{01}, v_{11} \gets \text{hashované hodnoty rohů}$
-\State $u \gets fade(x - x_0)$
-\State $v \gets fade(y - y_0)$
-\State \Return bilineární interpolace hodnot pomocí $(u, v)$
+\begin{algorithmic}[1]
+\State Spočítej celočíselnou souřadnici buňky:
+\State \quad $x_0 \gets \lfloor x \rfloor$, $y_0 \gets \lfloor y \rfloor$
+\State \quad $x_1 \gets x_0 + 1$, $y_1 \gets y_0 + 1$
+\State
+\State Spočítej lokální souřadnice bodu v buňce:
+\State \quad $u \gets x - x_0$, $v \gets y - y_0$ \Comment{$u,v \in [0,1)$}
+\State
+\State Získej náhodné hodnoty v rozích buňky:
+\State \quad $v_{00} \gets \text{randomValue}(x_0, y_0)$
+\State \quad $v_{10} \gets \text{randomValue}(x_1, y_0)$
+\State \quad $v_{01} \gets \text{randomValue}(x_0, y_1)$
+\State \quad $v_{11} \gets \text{randomValue}(x_1, y_1)$
+\State
+\State Spočítej vyhlazené váhy v osách:
+\State \quad $s_x \gets fade(u)$
+\State \quad $s_y \gets fade(v)$
+\State
+\State Interpoluj v ose $x$:
+\State \quad $a \gets lerp(v_{00}, v_{10}, s_x)$
+\State \quad $b \gets lerp(v_{01}, v_{11}, s_x)$
+\State
+\State Výsledná hodnota je interpolace v ose $y$:
+\State \quad \Return $lerp(a, b, s_y)$
 \end{algorithmic}
 \end{algorithm}
 
@@ -131,14 +138,45 @@ sample(x : float, y : float) -> float in [0,1]
 
 \begin{algorithm}[H]
 \caption{PerlinNoise.sample(x, y)}
-\begin{algorithmic}
-\State $(x_0, y_0) \gets \lfloor x \rfloor, \lfloor y \rfloor$
-\State $(x_1, y_1) \gets (x_0 + 1, y_0 + 1)$
-\State $g_{00}, g_{10}, g_{01}, g_{11} \gets \text{gradienty rohů}$
-\State $n_{00}, n_{10}, n_{01}, n_{11} \gets \text{skalární součiny s gradienty}$
-\State $sx \gets fade(x - x_0)$
-\State $sy \gets fade(y - y_0)$
-\State \Return interpolace $n_{00}, n_{10}, n_{01}, n_{11}$ pomocí $(sx, sy)$
+\begin{algorithmic}[1]
+\State Spočítej celočíselnou souřadnici buňky:
+\State \quad $x_0 \gets \lfloor x \rfloor$, $y_0 \gets \lfloor y \rfloor$
+\State \quad $x_1 \gets x_0 + 1$, $y_1 \gets y_0 + 1$
+\State
+\State Spočítej lokální souřadnice bodu v buňce:
+\State \quad $u \gets x - x_0$, $v \gets y - y_0$
+\State
+\State Získej gradientové vektory v rozích buňky:
+\State \quad $g_{00} \gets \text{randomGradient}(x_0, y_0)$
+\State \quad $g_{10} \gets \text{randomGradient}(x_1, y_0)$
+\State \quad $g_{01} \gets \text{randomGradient}(x_0, y_1)$
+\State \quad $g_{11} \gets \text{randomGradient}(x_1, y_1)$
+\State
+\State Spočítej vektory od rohu k bodu:
+\State \quad $d_{00} \gets (u, v)$
+\State \quad $d_{10} \gets (u - 1, v)$
+\State \quad $d_{01} \gets (u, v - 1)$
+\State \quad $d_{11} \gets (u - 1, v - 1)$
+\State
+\State Spočítej skalární součiny (příspěvky z rohů):
+\State \quad $n_{00} \gets dot(g_{00}, d_{00})$
+\State \quad $n_{10} \gets dot(g_{10}, d_{10})$
+\State \quad $n_{01} \gets dot(g_{01}, d_{01})$
+\State \quad $n_{11} \gets dot(g_{11}, d_{11})$
+\State
+\State Spočítej vyhlazené váhy v osách:
+\State \quad $s_x \gets fade(u)$
+\State \quad $s_y \gets fade(v)$
+\State
+\State Interpoluj příspěvky v ose $x$:
+\State \quad $a \gets lerp(n_{00}, n_{10}, s_x)$
+\State \quad $b \gets lerp(n_{01}, n_{11}, s_x)$
+\State
+\State Výsledná hodnota je interpolace v ose $y$:
+\State \quad $h \gets lerp(a, b, s_y)$
+\State
+\State Normalizuj do intervalu $[0,1]$:
+\State \quad \Return $0.5 \cdot h + 0.5$
 \end{algorithmic}
 \end{algorithm}
 
@@ -146,15 +184,33 @@ sample(x : float, y : float) -> float in [0,1]
 
 \begin{algorithm}[H]
 \caption{WorleyNoise.sample(x, y)}
-\begin{algorithmic}
-\State najdi buňku $(i, j)$ obsahující bod $(x, y)$
-\State pro každou buňku v okolí $3 \times 3$:
-\State \quad spočítej pozici náhodného feature--pointu
-\State \quad spočítej vzdálenost od $(x,y)$
-\State \Return nejmenší nalezená vzdálenost (normalizovaná)
+\begin{algorithmic}[1]
+\State Najdi index buňky, která obsahuje bod $(x, y)$:
+\State \quad $i_0 \gets \lfloor x \rfloor$, $j_0 \gets \lfloor y \rfloor$
+\State
+\State Inicializuj minimální vzdálenost:
+\State \quad $minDist \gets +\infty$
+\State
+\State Pro všechny sousední buňky v okolí $3 \times 3$:
+\For{$\Delta j \gets -1$ \textbf{to} $1$}
+  \For{$\Delta i \gets -1$ \textbf{to} $1$}
+    \State $i \gets i_0 + \Delta i$
+    \State $j \gets j_0 + \Delta j$
+    \State Získej pozici náhodného feature--pointu v buňce $(i, j)$:
+    \State \quad $(p_x, p_y) \gets \text{randomPointInCell}(i, j)$
+    \State Spočítej eukleidovskou vzdálenost od $(x, y)$:
+    \State \quad $d \gets \sqrt{(p_x - x)^2 + (p_y - y)^2}$
+    \State Aktualizuj minimální vzdálenost:
+    \State \quad $minDist \gets \min(minDist, d)$
+  \EndFor
+\EndFor
+\State
+\State Normalizuj vzdálenost do intervalu $[0,1]$:
+\State \quad \Return $\text{normalize}(minDist)$
 \end{algorithmic}
 \end{algorithm}
 
+\newpage
 % ============================================================
 \section{Experimenty a výsledky}
 % ============================================================
@@ -190,53 +246,57 @@ Všechny tři noise algoritmy byly testovány se stejnými parametry:
 
 \subsection{Porovnání}
 
-Sem doplníš slovní komentář:
+\subsubsection{Value Noise}
 
-\begin{itemize}
-    \item hladkost,
-    \item přítomnost artefaktů,
-    \item charakter struktury,
-    \item vhodnost pro různé použití (terén, textury atd.).
-\end{itemize}
+Value noise je vizuálně nejjednodušší ze všech tří testovaných metod. Jeho hlavní vlastností je celková hladkost, která vychází z interpolace náhodných hodnot v rozích buněk. Přechody mezi světlými a tmavými oblastmi jsou poměrně plynulé, nicméně při větším přiblížení je možné pozorovat pravidelnou mřížkovou strukturu. Ta je způsobena tím, že samotné náhodné hodnoty nejsou nijak spojité – pouze interpolované.
+
+Výsledný šum je poměrně „měkký“ a jednoduchý, což může být výhodou nebo nevýhodou v závislosti na aplikaci. Hodí se pro základní generování textur nebo jemné výškové mapy, kde nejsou vyžadovány jemné detaily ani příliš přirozený vzhled. Pro komplexnější struktury je ale Value noise většinou nedostačující. 
+
+\subsubsection{Perlin Noise}
+
+Perlinův šum je z testovaných metod nejvyváženější. Vytváří vizuálně spojitější a hladší struktury než Value noise a zároveň nabízí mnohem přirozenější variabilitu. Díky gradientové konstrukci je šum plynulý ve všech směrech a přechody mezi oblastmi jsou jemné. Perlin noise také nevykazuje výrazné blokové artefakty, které jsou typické pro Value noise.
+
+Jedním z mála možných artefaktů je jemná mřížková stopa při extrémním přiblížení, ale u standardního použití je prakticky neviditelná. Perlinův šum se velmi dobře hodí pro generování terénů, oblaků, organických vzorů nebo přírodních textur. Je to univerzální metoda, která poskytuje realistický, hladký charakter a lze ji snadno kombinovat do více oktáv (fBm), čímž vznikají bohaté a detailní struktury. 
+
+
+\subsection{Worley Noise}
+
+Worley noise se od předchozích metod zásadně liší. Nevytváří hladké nebo spojité struktury, ale výrazné buněčné vzory připomínající Voroného diagram. Ty jsou charakteristické tmavými oblastmi v místech nejbližších feature pointů a světlejšími přechody směrem k hranicím buněk. Šum nepůsobí hladce, ale spíše ostře a segmentovaně.
+
+Tento typ šumu je velmi vhodný pro efekty, které mají přirozeně buněčný charakter — například textury kamene, popraskaných povrchů, lávy, pěny nebo biomorfních struktur. Naopak se nehodí pro generování terénu nebo měkkých přírodních tvarů, kde je žádoucí spojitost a hladkost. 
 
 \subsection{Tabulka výsledků}
 
-Zde můžeš mít např. rozptyl nebo průměrnou gradientní změnu:
-
 \begin{table}[H]
 \centering
-\begin{tabular}{lccc}
+\small
+\begin{tabular}{lcccc}
 \toprule
-Metoda & Minimum & Maximum & Průměrná změna gradientu \\
+Metoda & Hladkost & Artefakty & Charakter & Typické použití \\
 \midrule
-Value Noise & ... & ... & ... \\
-Perlin Noise & ... & ... & ... \\
-Worley Noise & ... & ... & ... \\
+Value Noise & střední & mřížkové bloky & jednoduchý & základní textury \\
+Perlin Noise & vysoká & minimální & organický & terény, mraky \\
+Worley Noise & nízká & buněčné tvary & segmentovaný & kámen, praskliny \\
 \bottomrule
 \end{tabular}
+\caption{Porovnání vlastností jednotlivých noise algoritmů.}
 \end{table}
 
+\newpage
 % ============================================================
 \section{Závěr}
 % ============================================================
 
-Zde stručně shrneš:
+V této práci byly implementovány a porovnány tři algoritmy pro procedurální generování dvourozměrného šumu: Value Noise, Perlin Noise a Worley Noise. Každý z nich představuje odlišný přístup k tvorbě pseudonáhodných struktur a vykazuje specifické vizuální i technické vlastnosti. Implementace byla sjednocena pod jednotné rozhraní a jednotlivé metody byly testovány za stejných podmínek, což umožnilo jejich objektivní porovnání.
 
-\begin{itemize}
-    \item co bylo implementováno,
-    \item jaké rozdíly byly pozorovány,
-    \item kdy se která metoda hodí,
-    \item co by šlo dále rozšířit (např. fBm, domain warping).
-\end{itemize}
+Z experimentů vyplynulo, že Value Noise poskytuje nejjednodušší a nejhladší výsledek, avšak jeho vizuální komplexita je omezená a často trpí mřížkovými artefakty. Perlin Noise se ukázal jako nejvyváženější metoda — vytváří spojité, organické struktury s minimem artefaktů a je vhodný pro širokou škálu aplikací, zejména v oblasti počítačové grafiky. Naproti tomu Worley Noise produkuje výrazně odlišné, buněčné a segmentované vzory, které se nehodí pro generování plynulých povrchů, ale jsou ideální pro textury jako kámen, pěna nebo přírodní útvary s ostřejší strukturou.
 
-% ============================================================
-\section{Literatura}
-% ============================================================
+Celkově lze říci, že každá z metod má své specifické využití. Perlin Noise je univerzální volbou pro přirozeně působící šum, Value Noise se hodí pro jednodušší textury a Worley Noise dominuje při generování buněčných nebo voronoi-jako struktur. Možným rozšířením této práce je implementace více oktáv (fractal Brownian motion), kombinace různých typů šumu které by umožnily vytvářet ještě komplexnější a realističtější procedurální vzory.
 
-\begin{enumerate}
-    \item Ken Perlin: \textit{An Image Synthesizer}, ACM SIGGRAPH, 1985.
-    \item Steven Worley: \textit{A Cellular Texture Basis Function}, SIGGRAPH, 1996.
-    \item Další zdroje, které použiješ.
-\end{enumerate}
+\newpage
+\bibliographystyle{plain}
+\bibliography{citations}
+
+
 
 \end{document}
