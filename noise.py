@@ -72,6 +72,39 @@ class ValueNoise2D:
 
         return value  # [0,1]
 
+#  fBm Value Noise wrapper
+class FBMValueNoise2D:
+    """
+    fBm (fractal Brownian motion) using ValueNoise2D as the base noise.
+    """
+
+    def __init__(
+        self,
+        seed: int = 0,
+        octaves: int = 5,
+        lacunarity: float = 2.0,
+        gain: float = 0.5,
+    ) -> None:
+        self.base = ValueNoise2D(seed=seed)
+        self.octaves = octaves
+        self.lacunarity = lacunarity
+        self.gain = gain
+
+    def sample(self, x: float, y: float) -> float:
+        amp = 1.0
+        freq = 1.0
+        total = 0.0
+        amp_sum = 0.0
+
+        for _ in range(self.octaves):
+            total += self.base.sample(x * freq, y * freq) * amp
+            amp_sum += amp
+
+            freq *= self.lacunarity
+            amp *= self.gain
+
+        # normalize to [0,1]
+        return total / amp_sum
 
 #  Perlin noise (gradient)
 class PerlinNoise2D:
@@ -189,23 +222,27 @@ def save_noise_image(noise, width: int, height: int, scale: float, filename: str
 
 
 def main():
-    # unified parameters for all noise models
     WIDTH = 512
     HEIGHT = 512
     SCALE = 0.02
     SEED = 1234
 
-    # three models with the same seed
     value_noise = ValueNoise2D(seed=SEED)
     perlin_noise = PerlinNoise2D(seed=SEED)
     worley_noise = WorleyNoise2D(seed=SEED)
 
+    # NEW: fBm value noise
+    fbm_value_noise = FBMValueNoise2D(seed=SEED, octaves=6, lacunarity=2.0, gain=0.5)
+
     save_noise_image(value_noise, WIDTH, HEIGHT, SCALE, "output/value_noise.pgm")
+    save_noise_image(fbm_value_noise, WIDTH, HEIGHT, SCALE, "output/fbm_value_noise.pgm")
     save_noise_image(perlin_noise, WIDTH, HEIGHT, SCALE, "output/perlin_noise.pgm")
     save_noise_image(worley_noise, WIDTH, HEIGHT, SCALE, "output/worley_noise.pgm")
 
-    print("Images generated: value_noise.pgm, perlin_noise.pgm, worley_noise.pgm")
-
-
+    print("Images generated:\n"
+          " - value_noise.pgm\n"
+          " - fbm_value_noise.pgm\n"
+          " - perlin_noise.pgm\n"
+          " - worley_noise.pgm")
 if __name__ == "__main__":
     main()
