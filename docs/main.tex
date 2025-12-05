@@ -75,9 +75,11 @@ Všechny algoritmy budou implementovány v jazyce Python a porovnávány při st
 % ============================================================
 
 \subsection{Value Noise}
-Value noise je jednoduchý procedurální šum, ve kterém je každému rohu mřížky přiřazena pseudonáhodná skalární hodnota. Hodnota šumu uvnitř buňky se pak získává interpolací těchto čtyř hodnot, obvykle pomocí lineární nebo vyhlazené fade funkce. Výsledkem je hladký, vizuálně jednoduchý šum, který zachovává základní mřížkovou strukturu.
+Value noise je jednoduchý procedurální šum, ve kterém je každému rohu mřížky přiřazena pseudonáhodná skalární hodnota. Hodnota šumu uvnitř buňky se pak získává interpolací těchto čtyř hodnot, obvykle pomocí lineární nebo vyhlazené fade funkce. Výsledkem je hladký, vizuálně jednoduchý "kostkovitý" šum, který zachovává základní mřížkovou strukturu.
 
-Výhodou value noise je jeho rychlá a snadná implementace a nízká výpočetní náročnost. Nevýhodou je omezená vizuální komplexnost a to, že výsledný šum může působit uměle nebo příliš pravidelně. Value noise se používá spíše jako úvodní metoda nebo základ pro složitější algoritmy, které z něj vycházejí. \cite{wikipedia_value_noise}
+Výhodou value noise je jeho rychlá a snadná implementace a nízká výpočetní náročnost. Nevýhodou je omezená vizuální komplexnost a to, že výsledný šum může působit uměle nebo příliš pravidelně. Value noise se používá spíše jako úvodní metoda nebo základ pro složitější algoritmy, které z něj vycházejí a její základní podopa se v praxi moc nevyužívá.
+
+Za pomoci fBm (fractional Brownian motion) lze základní value noise dále rozšířit a výrazně zvýšit jeho vizuální komplexitu. fBm je metoda, která kombinuje více „oktáv“ šumu — tedy více vrstev value noise — kde každá oktáva má vyšší frekvenci a nižší amplitudu než předchozí. \cite{wikipedia_value_noise}
 
 \subsection{Perlin Noise}
 Perlin noise, který navrhl Ken Perlin v roce 1985, je gradientový šum. Místo náhodných hodnot přiřazuje každému rohu buňky náhodný gradientový vektor. Hodnota šumu se vypočítá jako skalární součin tohoto vektoru a směru k vyhodnocovanému bodu. Výsledný šum je následně plynule interpolován pomocí speciální vyhlazovací funkce.
@@ -229,7 +231,13 @@ Všechny tři noise algoritmy byly testovány se stejnými parametry:
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.45\linewidth]{value_noise.png}
-\caption{Value Noise}
+\caption{Value Noise (bez fBm)}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.45\linewidth]{fbm_value_noise.png}
+\caption{Value Noise (s využitím fBm)}
 \end{figure}
 
 \begin{figure}[H]
@@ -244,13 +252,12 @@ Všechny tři noise algoritmy byly testovány se stejnými parametry:
 \caption{Worley Noise}
 \end{figure}
 
+\newpage
 \subsection{Porovnání}
 
 \subsubsection{Value Noise}
 
-Value noise je vizuálně nejjednodušší ze všech tří testovaných metod. Jeho hlavní vlastností je celková hladkost, která vychází z interpolace náhodných hodnot v rozích buněk. Přechody mezi světlými a tmavými oblastmi jsou poměrně plynulé, nicméně při větším přiblížení je možné pozorovat pravidelnou mřížkovou strukturu. Ta je způsobena tím, že samotné náhodné hodnoty nejsou nijak spojité – pouze interpolované.
-
-Výsledný šum je poměrně „měkký“ a jednoduchý, což může být výhodou nebo nevýhodou v závislosti na aplikaci. Hodí se pro základní generování textur nebo jemné výškové mapy, kde nejsou vyžadovány jemné detaily ani příliš přirozený vzhled. Pro komplexnější struktury je ale Value noise většinou nedostačující. 
+Value Noise je založen na interpolaci náhodných hodnot v rozích mřížkových buněk. Základní varianta (jedna oktáva) vykazuje výrazně blocky strukturu s viditelnými přechody mezi buňkami, což omezuje jeho praktické využití. Value Noise kombinující více oktáv dosahuje výrazně hladšího výsledku s plynulejšími přechody, ale stále postrádá detail a přirozenost ve srovnání metodami využívající gradienty. Výsledný šum je poměrně "měkký" a jednoduchý. Hodí se pro základní generování terénů nebo mraků, kde není vyžadován vysoký realismus.
 
 \subsubsection{Perlin Noise}
 
@@ -269,14 +276,15 @@ Tento typ šumu je velmi vhodný pro efekty, které mají přirozeně buněčný
 
 \begin{table}[H]
 \centering
-\small
+\footnotesize  % Zmenši font
 \begin{tabular}{lcccc}
 \toprule
-Metoda & Hladkost & Artefakty & Charakter & Typické použití \\
+Metoda & Hladkost & Charakter & Typické použití & Poznámka \\
 \midrule
-Value Noise & střední & mřížkové bloky & jednoduchý & základní textury \\
-Perlin Noise & vysoká & minimální & organický & terény, mraky \\
-Worley Noise & nízká & buněčné tvary & segmentovaný & kámen, praskliny \\
+Value Noise (1 oktáva) & nízká & blocky, artificiální & prototypy & mřížková struktura \\
+Value Noise (fBm) & střední & měkký, jednoduchý & oblaka, terény & vyžaduje více oktáv \\
+Perlin Noise & vysoká & organický, přírodní & terény, textury & standard pro CGI \\
+Worley Noise & nízká & buněčný, segmentovaný & kámen, praskliny & vzdálenostní funkce \\
 \bottomrule
 \end{tabular}
 \caption{Porovnání vlastností jednotlivých noise algoritmů.}
@@ -289,10 +297,9 @@ Worley Noise & nízká & buněčné tvary & segmentovaný & kámen, praskliny \\
 
 V této práci byly implementovány a porovnány tři algoritmy pro procedurální generování dvourozměrného šumu: Value Noise, Perlin Noise a Worley Noise. Každý z nich představuje odlišný přístup k tvorbě pseudonáhodných struktur a vykazuje specifické vizuální i technické vlastnosti. Implementace byla sjednocena pod jednotné rozhraní a jednotlivé metody byly testovány za stejných podmínek, což umožnilo jejich objektivní porovnání.
 
-Z experimentů vyplynulo, že Value Noise poskytuje nejjednodušší a nejhladší výsledek, avšak jeho vizuální komplexita je omezená a často trpí mřížkovými artefakty. Perlin Noise se ukázal jako nejvyváženější metoda — vytváří spojité, organické struktury s minimem artefaktů a je vhodný pro širokou škálu aplikací, zejména v oblasti počítačové grafiky. Naproti tomu Worley Noise produkuje výrazně odlišné, buněčné a segmentované vzory, které se nehodí pro generování plynulých povrchů, ale jsou ideální pro textury jako kámen, pěna nebo přírodní útvary s ostřejší strukturou.
+Z experimentů vyplynulo, že základní Value Noise (jedna oktáva) trpí výraznou kostovou strukturou a viditelnými mřížkovými artefakty, které jej činí nevhodným pro většinu praktických aplikací. Fraktální varianta Value Noise (fBm) kombinující více oktáv dosahuje výrazně hladšího výsledku, avšak stále nedosahuje kvality metod za využití gradientu. Perlin Noise se ukázal jako nejvyváženější metoda — vytváří spojité, organické struktury s minimem artefaktů již v základní variantě a je vhodný pro širokou škálu aplikací v oblasti počítačové grafiky a procedurálního generování terénů. Naproti tomu Worley Noise produkuje výrazně odlišné, buněčné a segmentované vzory založené na výpočtu vzdáleností. Není určen pro generování plynulých povrchů, ale vyniká při tvorbě specifických textur jako je kámen, žíraní kůže, praskliny nebo jiné přírodní struktury s buněčným charakterem.
 
-Celkově lze říci, že každá z metod má své specifické využití. Perlin Noise je univerzální volbou pro přirozeně působící šum, Value Noise se hodí pro jednodušší textury a Worley Noise dominuje při generování buněčných nebo voronoi-jako struktur. Možným rozšířením této práce je implementace více oktáv (fractal Brownian motion), kombinace různých typů šumu které by umožnily vytvářet ještě komplexnější a realističtější procedurální vzory.
-
+Celkově lze říci, že každá z metod má své specifické využití. Perlin Noise je univerzální volbou pro přirozeně působící šum a standard v odvětví. Value Noise ve fraktální variantě se hodí pro základní textury a atmosférické efekty, kde není vyžadován vysoký realismus. Worley Noise dominuje při generování buněčných nebo voronoi-podobných struktur. V rámci práce byla také implementována podpora fraktálního šumu (fractal Brownian motion) pro Value Noise, což demonstruje možnost zvýšení kvality výsledků kombinací více oktáv.
 \newpage
 \bibliographystyle{plain}
 \bibliography{citations}
